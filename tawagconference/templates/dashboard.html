@@ -1,0 +1,266 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie-edge">
+  <title>Video Conference</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+  
+
+  <style>
+    body {
+      background-color: #1c1f2e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    /* center the div named dashboard */
+    .dashboard {
+      margin: auto;
+      width: 100%;
+      padding: 10px;
+      color: white;
+      text-align: center;
+    }
+
+    /** align the text inside the div named dashboard to the center */
+    .dashboard h1 {
+      font-size: 50px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .dashboard a {
+      background-color: #0086b7;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 50px;
+    }
+
+    .dashboard a {
+      margin-top: 7px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 30%;
+    }
+
+    .dashboard a:hover {
+      background-color: white;
+      color: #0086b7;
+    }
+
+    .dashboard {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .logout i {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1.5rem;
+    }
+
+    .logout i:hover{
+      color: #0086b7;
+    }
+
+
+    /*--------------------FOR MODALS CSS--------------------*/
+    
+    /* The Modal (background) */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      padding-top: 100px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: #1c1f2e; /* Fallback color */
+      background-color: #1c1f2e88;
+      backdrop-filter: blur(5px); /* Adjust the blur value as needed */
+    }
+
+    /* Modal Content */
+    .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 50%;
+      border-radius: 10px;
+    }
+
+    /* The Close Button */
+    .close {
+      color: #aaaaaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .modal-content p{
+      color: #000;
+    }
+
+
+    /*for modal inside text Join Room*/
+    .modal-content p{
+      font-size: 2rem;
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    /*for modals inside input field*/
+    .modal-content input{
+      height: 50px;
+      width: 50%;
+      padding: 0 15px;
+      font-size: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    /*for inside join button*/
+    .modal-content input.button{
+      color: #fff;
+      background: #00aff0;
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      margin-top: 1rem;
+      cursor: pointer;
+      transition: 0.4s;
+      margin-bottom: 20px;
+      width: 20%;
+      border-radius: 20px;
+      border: none;
+      padding: 5px;
+    }
+
+
+    /*-----------------------------------------------------*/
+
+    @media screen and (max-width: 880px){
+      .dashboard h1{
+        font-size: 30px;
+      }
+
+      .dashboard img {
+        max-width: 200px; /* Set the maximum width to 150px */
+        max-height: 200px; /* Set the maximum height to 150px */
+      }
+
+      .dashboard a{
+        font-size: 10px;
+      }
+
+      .modal-content p{
+        font-size: 1.5rem;
+      }
+
+      .modal-content input.button{
+        width: 100%;
+      }
+      
+        }
+
+
+  </style>
+
+  <body>
+    <div class="dashboard">
+      <img src="{% static 'images/Tawag1.png' %}" alt="logo" style="width: 200px; height: 200px;">
+      <h1>Welcome, {{name}}!</h1>
+      <!-- Create a "New Meeting" button -->
+      <a href="{% url 'meeting' %}" class="button"><i class="fas fa-video"></i> New Meeting</a>
+      <!--<a href="{% url 'room' %}" class="button"><i class="fas fa-user-plus"></i> Join Meeting</a>-->
+
+      <!-----------FOR MOFALS HTML------------------------->
+      <!-- Trigger/Open The Modal -->
+      <a  class="button" id="myBtn"><i class="fas fa-user-plus"></i>Join Meeting</a>
+
+      <!-- The Modal -->
+      <div id="myModal" class="modal">
+
+          <!-- Modal content -->
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Join Room</p>
+            <form action="{% url 'room' %}" method="POST">
+              {% csrf_token %}
+              <input type="text" placeholder="Enter room ID" name="roomID" required>
+              <br>
+              <br>
+              <input type="submit" class="button" value="Join">
+              <center>
+                {% if success %}
+                <p style="color: green;"><b>{{ success }}</b></p>
+                {% endif %}
+                {% if error %}
+                <p style="color: red;">{{ error }}</p>
+                {% endif %}
+              </center>
+            </form>
+          </div>
+      </div>
+      <!--------------------------------------------------->
+
+      
+      <!----------------FORM MODALS SCRIPTS---------------->
+      <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
+        
+        // Get the button that opens the modal
+        var btn = document.getElementById("myBtn");
+        
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+        
+        // When the user clicks the button, open the modal 
+        btn.onclick = function() {
+          modal.style.display = "block";
+        }
+        
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+          modal.style.display = "none";
+        }
+        </script>
+      <!--------------------------------------------------->
+
+    </div>
+    <!--if user click the logout it will jump in main page or the index by using this code href="{% url 'index' %}"-->
+    <a href="{% url 'index' %}" class="logout"><i class="fas fa-sign-out-alt"></i></a>
+  </body>
+</head>
+</html>
